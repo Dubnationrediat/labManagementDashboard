@@ -1,0 +1,7 @@
+user role = 0 for students 
+user role = 1 for admin
+user role = 2 for inactive or graduated students
+
+
+when deleting incorporate the toDelete functinality for both gas and chemcial
+jump to the front end. if possible test everything in backend using postman one time
