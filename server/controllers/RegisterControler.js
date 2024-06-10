@@ -35,7 +35,7 @@ export let register = (req,res)=>{
                 }else{
                     if(data.length>0){
                         res.send({
-                            messageToTheFront :'email already registered',
+                            messageToTheFront :'User already registered please login',
                             navigation : '/login',
                             messageToUser:'click here to login',
                         })

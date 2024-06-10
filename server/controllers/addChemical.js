@@ -3,7 +3,6 @@ import connectionInfo from "../schema/db.config.js";
 
 export let addChemicals = (req, res) => {
     let imageFilePath = req.file ? req.file.path : 'not provided'; 
-    console.log(imageFilePath)
     const {
         chemical_name,
         chemical_unit_of_measurement,
@@ -18,9 +17,8 @@ export let addChemicals = (req, res) => {
         chemical_ordered_by,
         chemical_priority
     } = req.body;
-
     if (!chemical_name || !chemical_formula || !chemical_purity || !chemical_manufacturer || !chemical_state || !chemical_packaging || !chemical_amount || !chemical_expire_date || !chemical_location || !chemical_ordered_by || !chemical_priority || !chemical_unit_of_measurement) {
-        res.status(400).send({
+        res.status(400).json({
             message: "All input fields are required"
         });
     } else {
@@ -32,7 +30,9 @@ export let addChemicals = (req, res) => {
             res.json({
                 message: "Chemical name or Chemical ordered by fields should only contain alphabets"
             });
+        
         } else if (!isNumberRegex.test(chemical_amount)) {
+           
             res.json({
                 message: "Chemical amount field should only contain number"
             });

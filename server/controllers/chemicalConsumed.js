@@ -2,7 +2,7 @@ import connectionInfo from "../schema/db.config.js";
 
 export let chemicalsConsumed = async (req, res) => {
     const {  chemical_id, user_id, amount_consumed } = req.body;
-
+ console.log(req.body)
     const isNumberRegex=/^\d+$/;
     if ( !chemical_id || !user_id || !amount_consumed) {
         res.json({
@@ -66,3 +66,5 @@ export let chemicalsConsumed = async (req, res) => {
     }
 
 };
+
+

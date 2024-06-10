@@ -83,3 +83,17 @@ CREATE TABLE IF NOT EXISTS gases_consumed (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (gas_consumption_id)
 )`;
+
+
+export let consumables = `
+CREATE TABLE IF NOT EXISTS consumables (
+  consumables_id INT AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  consumable_name TEXT NOT NULL,
+  consumable_location VARCHAR(255) NOT NULL,
+  Picture_location VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (consumables_id)
+)
+`

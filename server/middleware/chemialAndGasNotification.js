@@ -175,25 +175,5 @@ function sendEmail(gases, allEmails) {
 
 
 
-export let zeroChemcialDelete = (req,res)=>{
-     const zeroChemcialDeleteQuery = `DELETE * FROM chemicals WHERE chemical_amount <= 0`
-     connectionInfo.query(zeroChemcialDeleteQuery,(err,data)=>{
-        if(err){
-            res.json({
-                message:'something wrong please try again'
-            })
-        }else{
-            if(!data){
-                res.json({
-                    message:"there is no chemical with zero quantity"
-                })
-            }
-            res.json({
-                message:'chemicals with zero  empty are deleted'
-            })
-        }
-     })
-};
-
 
 

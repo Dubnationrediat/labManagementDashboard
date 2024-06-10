@@ -5,7 +5,8 @@ import {
   gases,
   chemicalsConsumed,
   gasesConsumed,
-  profile
+  profile,
+  consumables
 } from "../schema/table.js";
 
 export const tableCreation = async (req, res) => {
@@ -23,6 +24,8 @@ export const tableCreation = async (req, res) => {
     await con.query(gasesConsumed);
 
     await con.query(profile);
+
+    await con.query(consumables)
 
 
     // Send success response

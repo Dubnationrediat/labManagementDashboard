@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 import connectionInfo from './schema/db.config.js'
 import {Route} from './Routes/index.js'
 dotenv.config()
-// * route imports
+
 // *middlewares
 const app = express()
 app.use((req, res, next) => {
@@ -17,11 +17,11 @@ app.use((req, res, next) => {
   });
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
-app.use(cors({
-    origin : 'http://localhost:3000',
-    credentials:true
-}))
-
+// app.use(cors({
+//     origin : 'http://localhost:3000',
+//     credentials:true
+// }))
+app.use(cors())
 
 // * main routes 
 app.use(Route)

@@ -11,5 +11,4 @@ let connectionInfo = mysql.createConnection({
 });
 
 
-
 export default connectionInfo

@@ -5,19 +5,19 @@ connectionInfo
 export let addGas = (req, res) => {
     const { gas_name, gas_cylinders_amount } = req.body;
     let gas_bill_path = req.file ? req.file.path : 'not provided'; 
-
+    const isStringRegex = /^[A-Za-z\s]+$/;
+    const isNumberRegex = /^\d+$/;
     if (!gas_name || !gas_cylinders_amount) {
         res.status(400).send({
             message: "All input fields are required"
         });
     } else {
-        const isStringRegex = /^[A-Za-z\s]+$/;
         if (!isStringRegex.test(gas_name)) {
             res.json({
                 message: "gas name should only contain alphabets"
             });
         } else {
-            if (typeof(gas_cylinders_amount) !== "number") {
+            if (!isNumberRegex.test(gas_cylinders_amount)) {
                 res.json({
                     message: "gas cylinder amount should only contain numbers"
                 });
