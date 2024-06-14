@@ -1,0 +1,7 @@
+.form-outline{
+    /* width: 50% !important; */
+
+}
+input{
+    outline: 0.5px solid  blue;
+}

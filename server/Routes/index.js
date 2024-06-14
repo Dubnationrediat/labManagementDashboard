@@ -14,7 +14,7 @@ import {deleteProfile} from '../controllers/deleteUser.js'
 const chemicalUploader = createImageUploader('./Resources/chemicalBills');
 const gasUploader = createImageUploader('./Resources/gasBills');
 const consumableUploader = createImageUploader('./Resources/consumables');
-
+import {forgetPassword,confirmation} from '../controllers/ForgotPasswordConfiguration.js'
 
 export let Route = express.Router()
 
@@ -33,5 +33,7 @@ Route.get('/delete-chemical/:chemical_id',deleteChemicalImage)
 Route.get('/delete-gas/:gas_id',deleteGasImage)
 Route.get('/delete-consumables/:consumables_id',deleteConsumableImage)
 Route.get('/deleteProfile',deleteProfile)
+Route.post('/update-Password',forgetPassword)
+Route.post('/password-confirm/:iv/:content',confirmation)
 
 
