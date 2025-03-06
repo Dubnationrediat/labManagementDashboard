@@ -14,7 +14,7 @@ export let addGas = (req, res) => {
     } else {
         if (!isStringRegex.test(gas_name)) {
             res.json({
-                message: "gas name should only contain alphabets"
+                message: "Gas name should only contain alphabets"
             });
         } else {
             if (!isNumberRegex.test(gas_cylinders_amount)) {
