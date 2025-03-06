@@ -18,7 +18,7 @@ export let login = (req, res) => {
         });
     }else if(!isPassword){
         res.send({
-            message: "invalid passwrod. password should contain at list eight character containig at list one upper case, one lower case, one number ,and one special character."
+            message: "invalid passwrod. password should contain at list eight character containing at list one upper case, one lower case, one number ,and one special character."
         });
     } else {
         let userChecker = `SELECT user_email, user_password, user_id, user_first_name FROM users WHERE user_email = '${email}'`;
@@ -41,7 +41,7 @@ export let login = (req, res) => {
                     const compare = bcrypt.compareSync(password, userData.user_password);
                     if (!compare) {
                         res.send({
-                            messageToTheFront: "wrong cridential, please try again...",
+                            messageToTheFront: "wrong credential, please try again...",
                             messageToUser: "Click here to sign up",
                             navigation: "/signup"
                         });

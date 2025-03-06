@@ -1,179 +1,131 @@
+
 import connectionInfo from "../schema/db.config.js";
 import nodemailer from 'nodemailer';
 
-export let chemcialNotifiyer = (req,res)=>{
+// Endpoint to get chemicals with high priority and low or zero amount
+export let chemcialNotifiyer = async (req, res) => {
     const chemcialAmountQuery = `SELECT * FROM chemicals WHERE chemical_priority='High' AND chemical_amount <= 0`;
-    connectionInfo.query(chemcialAmountQuery,(err,data)=>{
-        if(err){
-            console.log(err.message)
-        }else{
-            res.json({
-                data,
-            })
-        }
-    })
-    
+
+    try {
+        const [data] = await connectionInfo.promise().query(chemcialAmountQuery);
+        res.json({ data });
+    } catch (err) {
+        console.error("Error fetching chemical data:", err.message);
+        res.status(500).json({ message: "Error fetching chemical data" });
+    }
 };
 
+// Endpoint to get gases with cylinders that have zero or less amount
+export let gasNotifiyer = async (req, res) => {
+    const chemcialAmountQuery = `SELECT * FROM gases WHERE gas_cylinders_amount <= 0`;
 
-export let gasNotifiyer = (req,res)=>{
-    const chemcialAmountQuery = `SELECT * FROM gases WHERE  gas_cylinders_amount <= 0`;
-    connectionInfo.query(chemcialAmountQuery,(err,data)=>{
-        if(err){
-            console.log(err.message)
-        }else{
-            res.json({
-                data,
-            })
-        }
-    })
+    try {
+        const [data] = await connectionInfo.promise().query(chemcialAmountQuery);
+        res.json({ data });
+    } catch (err) {
+        console.error("Error fetching gas data:", err.message);
+        res.status(500).json({ message: "Error fetching gas data" });
+    }
 };
 
-// in the query make sure this logic for deleting zero value gases and chemicals to run very three days using useEffect
-
-export let zeroGasDelete = (req, res) => {
+// Delete zero value gases and send email notification every three days
+export let zeroGasDelete = async (req, res) => {
     const selectAllUsersEmail = 'SELECT user_email FROM users WHERE user_role=0';
     const selectAllGasesWithOne = 'SELECT gas_name FROM gases WHERE gas_cylinders_amount = 1';
     const deleteZeroGasQuery = `DELETE FROM gases WHERE gas_cylinders_amount = 0`;
 
-    // Step 1: Retrieve all user emails with role 0
-    connectionInfo.query(selectAllUsersEmail, (err, emails) => {
-        if (err) {
-            res.json({
-                message: "Error on fetching user data for email"
-            });
-        } else {
-            const allEmails = emails.map(email => email.user_email); // Extract emails
-              console.log("all emails are " + [allEmails])
-            // Step 2: Retrieve gases with cylinder amount equal to one
-            connectionInfo.query(selectAllGasesWithOne, (err, gases) => {
-                if (err) {
-                    res.json({
-                        message: "Error on fetching gases data"
-                    });
-                } else {
-                    // If there are gases with one cylinder, send email notification
-                    if (gases.length > 0) {
-                        sendEmail(gases, allEmails);
-                    }
+    try {
+        // Step 1: Get all user emails with role 0
+        const [emails] = await connectionInfo.promise().query(selectAllUsersEmail);
+        const allEmails = emails.map(email => email.user_email);
 
-                    // Step 3: Execute the delete query for gases with cylinder amount equal to zero
-                    connectionInfo.query(deleteZeroGasQuery, (err, result) => {
-                        if (err) {
-                            res.json({
-                                message: "Error deleting gas cylinders with zero amount"
-                            });
-                        } else {
-                            res.json({
-                                message: 'Gas cylinders with zero amount are deleted'
-                            });
-                        }
-                    });
-                }
-            });
+        console.log("All emails:", allEmails);
+
+        // Step 2: Get gases with one cylinder left
+        const [gases] = await connectionInfo.promise().query(selectAllGasesWithOne);
+
+        // Step 3: Send email if any gases have only one cylinder
+        if (gases.length > 0) {
+            sendEmail(gases, allEmails);
         }
-    });
+
+        // Step 4: Delete gases with zero cylinders
+        await connectionInfo.promise().query(deleteZeroGasQuery);
+
+        res.json({
+            message: 'Gas cylinders with zero amount are deleted',
+        });
+    } catch (err) {
+        console.error("Error processing gas deletion:", err.message);
+        res.status(500).json({
+            message: "Error deleting zero amount gas cylinders",
+        });
+    }
 };
 
-// Function to send email notification
+// Function to send email notifications
 function sendEmail(gases, allEmails) {
-    let mailSender = nodemailer.createTransport({
+    const mailSender = nodemailer.createTransport({
         service: "gmail",
         port: 465,
         auth: {
-            user: "red.terefe@gmail.com",
-            pass: "cvuvlniuqsjgmdbc",
+            user: process.env.EMAIL_USER, // Use environment variable for security
+            pass: process.env.EMAIL_PASS, // Use environment variable for security
         },
     });
 
-    let gasList = '';
-    gases.forEach(gas => {
-        gasList += `<tr><td>${gas.gas_name}</td></tr>`;
-    });
+    let gasList = gases.map(gas => `<tr><td>${gas.gas_name}</td></tr>`).join('');
 
-    let htmlContent = `
-<html>
-<head>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .container {
-            border: 1px solid black;
-            padding: 16px;
-            width: 50%;
-            margin: 20px auto;
-            background-color: #fe8402;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-            font-weight: bold;
-            color: #ffffff;
-        }
-        p {
-            font-weight: bold;
-            background-color: #fe8402;
-            color: #ffffff;
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-        }
-        /* Apply background color to gas list */
-        .gas-item {
-            background-color: #516cfo;
-            color: #ffffff; /* Set text color to white for better contrast */
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>List of Gases to be Ordered</h2>
-        <p>Only one cylinder of the listed gases is found in the store. Kindly order as soon as possible</p>
-        <table>
-            <tr>
-                <th>Gas Name</th>
-            </tr>
-            <!-- Apply background color to each gas list item -->
-            <small class="gas-item">${gasList} </small>
-            
-        </table>
-    </div>
-</body>
-</html>
+    const htmlContent = `
+    <html>
+    <head>
+        <style>
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid black; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .container {
+                border: 1px solid black;
+                padding: 16px;
+                width: 50%;
+                margin: 20px auto;
+                background-color: #fe8402;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            h2 { text-align: center; font-weight: bold; color: #ffffff; }
+            p { font-weight: bold; background-color: #fe8402; color: #ffffff; padding: 10px; text-align: center; border-radius: 5px; }
+            .gas-item { background-color: #516cfo; color: #ffffff; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>List of Gases to be Ordered</h2>
+            <p>Only one cylinder of the listed gases is found in the store. Kindly order as soon as possible</p>
+            <table>
+                <tr><th>Gas Name</th></tr>
+                <small class="gas-item">${gasList}</small>
+            </table>
+        </div>
+    </body>
+    </html>`;
 
-
-    `;
-
+    // Send email to each user
     allEmails.forEach(email => {
-        let details = {
-            from: "rediat_ta@ch.iitr.ac.in",
+        const mailOptions = {
+            from: process.env.EMAIL_FROM, // Use environment variable for security
             to: email,
             subject: "Notification for gas ordering",
             html: htmlContent
         };
 
-        mailSender.sendMail(details, (err) => {
+        mailSender.sendMail(mailOptions, (err) => {
             if (err) {
-                console.log(err.message);
+                console.error("Error sending email to:", email, err.message);
             } else {
-                console.log("Email sent to: " + email);
+                console.log("Email sent to:", email);
             }
         });
     });
 }
-
-
-
 
 

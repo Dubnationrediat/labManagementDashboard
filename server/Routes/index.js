@@ -18,22 +18,26 @@ import {forgetPassword,confirmation} from '../controllers/ForgotPasswordConfigur
 
 export let Route = express.Router()
 
+// user Related
 Route.get('/create-table',tableCreation)
 Route.post('/add-user',register)
 Route.post("/login",login)
-Route.post("/add-chemicals",chemicalUploader.single("chemicalReceipt_file"),addChemicals)
-Route.post("/add-gas",gasUploader.single("gassesReceipt_file"),addGas)
-Route.post("/add-consumables",consumableUploader.single("consumable_file"),consumables)
-Route.post("/chem-consu",chemicalsConsumed)
-Route.post("/gas-consu",gasConsumed)
-Route.get('/remain-chemcial',chemcialNotifiyer)
-Route.get('/remain-gas',gasNotifiyer)
-Route.get('/delete-gas',zeroGasDelete)
-Route.get('/delete-chemical/:chemical_id',deleteChemicalImage)
-Route.get('/delete-gas/:gas_id',deleteGasImage)
-Route.get('/delete-consumables/:consumables_id',deleteConsumableImage)
-Route.get('/deleteProfile',deleteProfile)
+Route.delete('/deleteProfile',deleteProfile)
 Route.post('/update-Password',forgetPassword)
 Route.post('/password-confirm/:iv/:content',confirmation)
+// chemical and consumables related
+Route.post("/add-chemicals",chemicalUploader.single("chemicalReceipt_file"),addChemicals)
+Route.post("/add-consumables",consumableUploader.single("consumable_file"),consumables)
+Route.post("/chem-consu",chemicalsConsumed)
+Route.get('/remain-chemcial',chemcialNotifiyer)
+Route.get('/delete-chemical/:chemical_id',deleteChemicalImage)
+// gas related
+Route.post("/add-gas",gasUploader.single("gassesReceipt_file"),addGas)
+Route.post("/gas-consu",gasConsumed)
+Route.get('/remain-gas',gasNotifiyer)
+Route.get('/delete-gas',zeroGasDelete)
+Route.get('/delete-gas/:gas_id',deleteGasImage)
+// ----------------
+Route.get('/delete-consumables/:consumables_id',deleteConsumableImage)
 
 
